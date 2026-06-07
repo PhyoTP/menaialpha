@@ -19,12 +19,18 @@ def respond_and_update(query, gradio_history):
         "role": "assistant",
         "content": resp["answer"],
         "metadata": {
-            "title":str(resp["context"])
+            "title":str("Sources: " + ", ".join([clean_context(i) for i in resp["context"]]))
         }
     })
     return "", gradio_history
-
+def clean_context(doc):
+    if doc.metadata.get("producer") == "PyPDF":
+        return doc.metadata.get("title") + " page " + str(doc.metadata.get("page"))
+    else:
+        return doc.metadata.get("title")
 with gr.Blocks() as demo:
+    gr.Markdown("""# Menai
+    For the BuildingBloCS June Jam Unity Workshop""")
     chatbot = gr.Chatbot(label="Menai", height="70vh")
     msg = gr.Textbox(placeholder="Type your message here...", label="Your Message")
 
